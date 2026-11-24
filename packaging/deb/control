@@ -1,0 +1,12 @@
+Package: nitro-unlock
+Version: 0.1.0-1
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3 (>= 3.9), pkexec | policykit-1
+Installed-Size: auto
+Maintainer: DenBroLiik <128605164+DenBroLiik@users.noreply.github.com>
+Homepage: https://github.com/DenBroLiik/nitro-unlock
+Description: temporary Intel RAPL PSys boost for Acer Nitro Lite 16
+ Launch a game with a 70 W platform budget on a supported Acer Nitro Lite 16
+ and restore the previous budget when the game exits.

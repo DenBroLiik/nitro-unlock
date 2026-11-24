@@ -1,0 +1,5 @@
+/src/
+/pkg/
+/packages/
+__pycache__/
+*.pkg.tar.*
