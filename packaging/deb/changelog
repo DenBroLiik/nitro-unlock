@@ -1,3 +1,9 @@
+nitro-unlock (0.1.1-1) unstable; urgency=medium
+
+  * Ignore the bundled Python environment inherited from AppImage launchers.
+
+ -- DenBroLiik <128605164+DenBroLiik@users.noreply.github.com>  Tue, 24 Nov 2026 23:48:26 +0300
+
 nitro-unlock (0.1.0-1) unstable; urgency=medium
 
   * Initial package with a per-game PSys boost and Polkit authorization.

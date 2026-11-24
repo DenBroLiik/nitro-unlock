@@ -67,6 +67,16 @@ def spawn(base, mode):
 
 with TemporaryDirectory() as temporary:
     base = Path(temporary)
+    appimage_env = os.environ | {
+        "PYTHONHOME": str(base / "appimage/usr"),
+        "PYTHONPATH": str(base / "appimage/usr/share/pyshared"),
+    }
+    response = subprocess.run(
+        [str(SCRIPT), "--help"], env=appimage_env, capture_output=True,
+        text=True, check=True, timeout=5,
+    )
+    assert "nitro-unlock [--] GAME" in response.stdout
+
     stock = (50_000_000, 50_000_000)
     boosted = (70_000_000, 70_000_000)
     for reason, baseline in (("close", stock), ("close", boosted), ("ac", stock),

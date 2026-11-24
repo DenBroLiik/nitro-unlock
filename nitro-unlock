@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -I
 """Opt-in, per-game Intel RAPL PSys boost for Acer Nitro Lite 16."""
 import fcntl
 import os

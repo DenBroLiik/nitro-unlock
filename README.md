@@ -11,13 +11,13 @@
 Arch Linux и производные
 
 ```bash
-sudo pacman -U ./nitro-unlock-0.1.0-1-any.pkg.tar.zst
+sudo pacman -U ./nitro-unlock-0.1.1-1-any.pkg.tar.zst
 ```
 
 Debian 12 и новее, а также Ubuntu с Python 3.9+ и Polkit
 
 ```bash
-sudo apt install ./nitro-unlock_0.1.0-1_all.deb
+sudo apt install ./nitro-unlock_0.1.1-1_all.deb
 ```
 
 Оба пакета устанавливают команду в `/usr/bin/nitro-unlock`. Для графического запроса авторизации нужен агент Polkit в пользовательской сессии. На Arch с Niri обёртка запускает установленный `plasma-polkit-agent.service`, если он доступен. Из терминала `pkexec` может использовать текстовую авторизацию.
@@ -32,7 +32,9 @@ sudo apt install ./nitro-unlock_0.1.0-1_all.deb
 /usr/bin/nitro-unlock /usr/bin/prime-run
 ```
 
-Настройки конкретной сборки имеют приоритет над общими. Запустите сборку и подтвердите запрос Polkit.
+Введите строку именно в настройках сборки и нажмите «Сохранить». Modrinth может показать общую команду в поле, даже когда сохранённое значение сборки пустое. Чтобы применить команду явно, отредактируйте поле и сохраните изменения. При следующем запуске подтвердите запрос Polkit.
+
+Версия 0.1.1 использует изолированный системный Python при запуске из Modrinth AppImage.
 
 Короткая проверка из терминала
 
