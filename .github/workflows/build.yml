@@ -1,0 +1,76 @@
+name: Build and test
+on:
+  push:
+    branches: [main]
+    tags: ['v1.2.0']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  debian:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up toolchain
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+      - run: cargo test --locked --offline
+      - run: ./packaging/deb/build.sh
+      - name: Check package
+        run: |
+          dpkg-deb --info packages/*.deb
+          dpkg-deb -x packages/*.deb /tmp/nitro-package
+          /tmp/nitro-package/usr/bin/nitro-unlock --version | grep -Fx 'nitro-unlock 1.2.0'
+          file /tmp/nitro-package/usr/bin/nitro-unlock
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nitro-unlock-debian-amd64
+          path: packages/*.deb
+          if-no-files-found: error
+  arch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    container: archlinux:base-devel
+    steps:
+      - name: Install toolchain
+        run: pacman -Syu --noconfirm rust polkit git
+      - uses: actions/checkout@v4
+      - name: Build Arch package as non-root
+        run: |
+          useradd -m builder
+          chown -R builder:builder .
+          runuser -u builder -- makepkg --noconfirm
+          pacman -Qip ./*.pkg.tar.zst
+          bsdtar -xf ./*.pkg.tar.zst -C /tmp usr/bin/nitro-unlock
+          /tmp/usr/bin/nitro-unlock --version | grep -Fx 'nitro-unlock 1.2.0'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nitro-unlock-arch-x86_64
+          path: '*.pkg.tar.zst'
+          if-no-files-found: error
+  release:
+    if: github.ref == 'refs/tags/v1.2.0'
+    needs: [debian, arch]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: nitro-unlock-*
+          merge-multiple: true
+          path: dist
+      - name: Create release after both builds pass
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cd dist
+          sha256sum *.deb *.pkg.tar.zst > SHA256SUMS
+          gh release create v1.2.0 --verify-tag --title 'nitro-unlock 1.2.0 — Rust' --notes 'Native Rust port. 70 W is experimental; use only with a healthy adapter. Hardware validation is not part of CI.' *.deb *.pkg.tar.zst SHA256SUMS

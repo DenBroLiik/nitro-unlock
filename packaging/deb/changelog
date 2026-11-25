@@ -1,3 +1,10 @@
+nitro-unlock (1.2.0-1) unstable; urgency=medium
+
+  * Port the wrapper and privileged worker to Rust.
+  * Add conservative thermal and battery-discharge guards.
+
+ -- DenBroLiik <128605164+DenBroLiik@users.noreply.github.com>  Wed, 25 Nov 2026 09:00:00 +0000
+
 nitro-unlock (0.1.1-1) unstable; urgency=medium
 
   * Ignore the bundled Python environment inherited from AppImage launchers.
