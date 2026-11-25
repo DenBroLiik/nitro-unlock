@@ -2,7 +2,7 @@ name: Build and test
 on:
   push:
     branches: [main]
-    tags: ['v1.2.0']
+    tags: ['v1.2.0', 'v1.2.0-r1']
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -45,16 +45,19 @@ jobs:
           useradd -m builder
           chown -R builder:builder .
           runuser -u builder -- makepkg --noconfirm
-          pacman -Qip ./*.pkg.tar.zst
-          bsdtar -xf ./*.pkg.tar.zst -C /tmp usr/bin/nitro-unlock
-          /tmp/usr/bin/nitro-unlock --version | grep -Fx 'nitro-unlock 1.2.0'
+          package=./nitro-unlock-1.2.0-1-x86_64.pkg.tar.zst
+          test -f "$package"
+          pacman -Qip "$package"
+          mkdir -p /tmp/nitro-arch-package
+          bsdtar -xf "$package" -C /tmp/nitro-arch-package usr/bin/nitro-unlock
+          /tmp/nitro-arch-package/usr/bin/nitro-unlock --version | grep -Fx 'nitro-unlock 1.2.0'
       - uses: actions/upload-artifact@v4
         with:
           name: nitro-unlock-arch-x86_64
-          path: '*.pkg.tar.zst'
+          path: nitro-unlock-1.2.0-1-x86_64.pkg.tar.zst
           if-no-files-found: error
   release:
-    if: github.ref == 'refs/tags/v1.2.0'
+    if: github.ref == 'refs/tags/v1.2.0' || github.ref == 'refs/tags/v1.2.0-r1'
     needs: [debian, arch]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -73,4 +76,4 @@ jobs:
         run: |
           cd dist
           sha256sum *.deb *.pkg.tar.zst > SHA256SUMS
-          gh release create v1.2.0 --verify-tag --title 'nitro-unlock 1.2.0 — Rust' --notes 'Native Rust port. 70 W is experimental; use only with a healthy adapter. Hardware validation is not part of CI.' *.deb *.pkg.tar.zst SHA256SUMS
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title 'nitro-unlock 1.2.0 — Rust' --notes 'Native Rust port. 70 W is experimental; use only with a healthy adapter. Hardware validation is not part of CI.' *.deb *.pkg.tar.zst SHA256SUMS

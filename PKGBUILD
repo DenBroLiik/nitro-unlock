@@ -8,6 +8,8 @@ url='https://github.com/DenBroLiik/nitro-unlock'
 license=('LicenseRef-All-Rights-Reserved')
 depends=('glibc' 'polkit')
 makedepends=('rust')
+# Cargo already strips release binaries; do not generate a debug split package.
+options=('!debug' '!strip')
 optdepends=('polkit-kde-agent: graphical Polkit authentication')
 build() {
     cd "$startdir"
